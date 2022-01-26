@@ -1,23 +1,40 @@
+
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { Grid, Row, Col } from "react-flexbox-grid";
 
 const App = () => {
-  const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState("");
+  const [todos, setTodos] = useState([]);
+  const [newTodo, setNewTodo] = useState("");
   const [filter, setFilter] = useState("");
   const addNewItem = () => {
-    setItems([...items, newItem]);
-    setNewItem("");
+    setTodos([
+      ...todos,
+      { description: newTodo, completed: false, createdAt: Date.now() }
+    ]);
+    setNewTodo("");
   };
-  const removeItem = (item) => {
-    setItems(items.filter((i) => i !== item));
+  const removeItem = (itemDsc) => {
+    setTodos(
+      todos.map((i) =>
+        i.description === itemDsc
+          ? {
+              ...i,
+              completed: !i.completed
+            }
+          : i
+      )
+    );
   };
-  const filteredItems = items.filter((item) => item.match(filter));
+  const filteredItems = todos.filter((item) => item.description.match(filter));
 
   const VisibleItems = filteredItems.map((i, index) => (
-    <li key={index} onClick={() => removeItem(i)}>
-      {i}
+    <li
+      key={index}
+      onClick={() => removeItem(i.description)}
+      style={i.completed ? { textDecorationLine: "line-through" } : null}
+    >
+      {i.description}
     </li>
   ));
   return (
@@ -39,10 +56,10 @@ const App = () => {
       <Row>
         <input
           type="text"
-          value={newItem}
+          value={newTodo}
           onChange={(e) => {
             e.preventDefault();
-            setNewItem(e.target.value);
+            setNewTodo(e.target.value);
           }}
         />
         <button onClick={addNewItem}>Add</button>
